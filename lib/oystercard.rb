@@ -15,9 +15,6 @@ MINIMUM_FARE = 1
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
 
   def touch_in
     allow_entry
@@ -25,7 +22,7 @@ MINIMUM_FARE = 1
   end
 
   def touch_out
-    journey_charge
+    deduct(MINIMUM_FARE) if @in_journey == true
    @in_journey = false
 
   end
@@ -38,8 +35,11 @@ MINIMUM_FARE = 1
     fail 'not enought money on card' if @balance < MINIMUM_FARE
   end
 
-  def journey_charge
-    @balance -= MINIMUM_FARE
+
+private
+
+  def deduct(amount)
+    @balance -= amount
   end
 
 end
