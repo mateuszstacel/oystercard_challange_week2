@@ -17,7 +17,7 @@ describe Oystercard do
     it 'raises an error if the maximum balance is over limit' do
         maximum_balance = Oystercard::MAX_BALANCE
         subject.top_up(maximum_balance)
-        expect{ subject.top_up 1 }.to raise_error 'Max limit is #{MAX_BALANCE}'
+        expect{ subject.top_up 1 }.to raise_error 'Max limit is £90'
       end
 
   end
@@ -51,11 +51,18 @@ describe Oystercard do
   end
 
     describe '#allow_entry' do
-      it {is_expected.to respond_to :allow_entry}
+      it { is_expected.to respond_to :allow_entry }
       it 'raise error if balance < 1' do
-      balance = 0
       expect{ subject.allow_entry }.to raise_error 'not enought money on card'
+      end
     end
+
+    describe '#journey_charge' do
+      it { is_expected.to respond_to :journey_charge }
+      it 'charging card after journey (touch_out)' do
+        journey_charge = Oystercard::MINIMUM_FARE
+        expect {subject.journey_charge}.to change {subject.balance}.by (-journey_charge)
+      end
 
     end
 
