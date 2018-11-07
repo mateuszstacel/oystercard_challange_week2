@@ -2,7 +2,8 @@ require 'oystercard'
 
 describe Oystercard do
 
-    let(:station) { double 'station' }
+    let(:entry_station) { double :station }
+    let(:exit_station) { double :station }
 
   describe '#balance' do
     it 'it is check if initialize balance is 0' do
@@ -34,19 +35,19 @@ describe Oystercard do
     it 'when user top up account allow to touch in' do
       card = Oystercard.new
       card.top_up(1)
-      card.touch_in(station)
+      card.touch_in(entry_station)
       expect(card.in_journey?).to eq true
     end
     it 'dont allow touch in if no enought money on account' do
       card = Oystercard.new
       card.top_up(0)
-      expect{ card.touch_in(station) }.to raise_error 'not enought money on card'
+      expect{ card.touch_in(entry_station) }.to raise_error 'not enought money on card'
     end
     it 'save the travel station' do
       card = Oystercard.new
       card.top_up(20)
-      card.touch_in(station)
-      expect(card.entry_station).to eq(station)
+      card.touch_in(entry_station)
+      expect(card.entry_station).to eq(entry_station)
     end
   end
 
@@ -55,22 +56,22 @@ describe Oystercard do
     it 'is expected to deduct money after journey' do
       card = Oystercard.new
       card.top_up(3)
-      card.touch_in(station)
-      card.touch_out(station)
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
       expect(card.balance).to eq 2
     end
     it 'is expected in journey to be false after test' do
       card = Oystercard.new
       card.top_up(5)
-      card.touch_in(station)
-      card.touch_out(station)
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
       expect(card.in_journey?).to be false
     end
     it 'forget the tavel station' do
       card = Oystercard.new
       card.top_up(90)
-      card.touch_in(station)
-      card.touch_out(station)
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
       expect(card.entry_station).to eq nil
 
     end
@@ -95,6 +96,22 @@ describe Oystercard do
       it 'raise error if balance < 1' do
       expect{ subject.allow_entry }.to raise_error 'not enought money on card'
       end
+    end
+
+    describe '#history' do
+      it 'return a history of card trip' do
+        expect{ subject.to respond_to :card_history }
+      end
+      it 'return empty array when no journey been made' do
+        expect(subject.history).to eq []
+      end
+      it 'return hasd in array when journey been made' do
+        card = Oystercard.new 10
+        card.touch_in(entry_station)
+        card.touch_out(exit_station)
+        expect(card.history).to eq [{entry_station: entry_station, exit_station: exit_station}]
+      end
+
     end
 
 
